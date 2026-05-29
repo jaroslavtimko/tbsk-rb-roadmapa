@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ROADMAPA – Raiffeisen banka</title>
+<style>
+@font-face {
+  font-family: 'Amalia';
+  src: url('./fonts/Amalia.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --yellow:    #ffd400;
+  --black:     #0b0b0b;
+  --gray:      #6b6b6b;
+  --white:     #ffffff;
+  --light:     #f4f4f4;
+  --lighter:   #fafafa;
+  --border:    #ddd;
+  --sidebar-w: 256px;
+  --banner-h:  46px;
+  --topbar-h:  52px;
+  --quarter-h: 22px;
+  --header-h:  40px;
+  --font:      'Amalia', system-ui, sans-serif;
+  --radius:    4px;
+  --shadow:    0 2px 10px rgba(0,0,0,.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--white);
+  color: var(--black);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.area-0 { --area-bg: #fffde7; --area-border: #f9a825; --area-text: #5d4000; }
+.area-1 { --area-bg: #e8f5e9; --area-border: #2e7d32; --area-text: #1b5e20; }
+.area-2 { --area-bg: #e8eaf6; --area-border: #3949ab; --area-text: #1a237e; }
+.area-3 { --area-bg: #fce4ec; --area-border: #c62828; --area-text: #7f0000; }
+.area-4 { --area-bg: #e0f7fa; --area-border: #00838f; --area-text: #005060; }
+.area-5 { --area-bg: #f3e5f5; --area-border: #6a1b9a; --area-text: #4a0072; }
+
+#page-banner {
+  height: var(--banner-h);
+  background: var(--yellow);
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  border-bottom: 2px solid #e6be00;
+}
+#banner-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1rem; font-weight: 800; letter-spacing: .01em;
+}
+#banner-title::before { content: '▲'; font-size: 1.1rem; opacity: .7; }
+#banner-filter { display: flex; align-items: center; gap: 8px; font-size: .8rem; font-weight: 700; }
+#banner-month {
+  height: 28px; padding: 0 8px;
+  background: rgba(0,0,0,.10); color: var(--black);
+  border: 1.5px solid rgba(0,0,0,.18); border-radius: var(--radius);
+  font-family: var(--font); font-size: .8rem; font-weight: 700;
+  cursor: pointer; appearance: auto;
+}
+#banner-month:focus { outline: 2px solid var(--black); }
+
+#topbar {
+  height: var(--topbar-h);
+  background: var(--light);
+  border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; flex-shrink: 0;
+}
+#topbar select {
+  background: var(--white); color: var(--black);
+  border: 1px solid #ccc; border-radius: var(--radius);
+  padding: 4px 8px; font-family: var(--font); font-size: .82rem; height: 32px;
+}
+#topbar select:focus { outline: 2px solid var(--yellow); outline-offset: 1px; }
+#filter-area { width: 200px; padding-right: 28px; appearance: auto; }
+#filter-months { height: 32px; min-width: 160px; max-width: 300px; }
+.filter-label { font-size: .78rem; color: var(--gray); font-weight: 600; white-space: nowrap; }
+#topbar .sep { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; }
+
+.btn-primary {
+  background: var(--yellow); color: var(--black); border: none;
+  border-radius: var(--radius); padding: 0 18px;
+  font-family: var(--font); font-weight: 700; font-size: .85rem;
+  cursor: pointer; height: 34px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .82; }
+.btn-primary:focus { outline: 2px solid var(--black); outline-offset: 2px; }
+.btn-primary .plus { font-size: 1.1rem; line-height: 1; }
+
+.btn-secondary {
+  background: var(--white); color: var(--gray); border: 1px solid #ccc;
+  border-radius: var(--radius); padding: 6px 16px;
+  font-family: var(--font); font-size: .82rem; cursor: pointer;
+}
+.btn-secondary:hover { border-color: var(--gray); }
+.btn-secondary:focus { outline: 2px solid var(--yellow); }
+
+.btn-danger {
+  background: #fff5f5; color: #c62828; border: 1px solid #e57373;
+  border-radius: var(--radius); padding: 6px 16px;
+  font-family: var(--font); font-weight: 700; font-size: .82rem;
+  cursor: pointer; margin-right: auto;
+}
+.btn-danger:hover { background: #ffebee; }
+.btn-danger:focus { outline: 2px solid #c62828; }
+
+#btn-reset-filter {
+  background: none; border: 1px solid #ccc; border-radius: var(--radius);
+  padding: 0 10px; height: 32px; font-family: var(--font);
+  font-size: .78rem; color: var(--gray); cursor: pointer; white-space: nowrap;
+}
+#btn-reset-filter:hover { border-color: var(--gray); }
+
+#main { display: flex; flex: 1; overflow: hidden; }
+#sidebar {
+  width: var(--sidebar-w); flex-shrink: 0; display: flex; flex-direction: column;
+  border-right: 2px solid var(--border); background: var(--lighter);
+}
+#sidebar .sidebar-header {
+  height: calc(var(--quarter-h) + var(--header-h));
+  background: var(--light); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 14px;
+  font-size: .7rem; color: var(--gray); text-transform: uppercase;
+  letter-spacing: .1em; font-weight: 700; flex-shrink: 0;
+}
+.sidebar-row {
+  flex: 1; display: flex; align-items: center;
+  padding: 6px 12px 6px 14px; border-bottom: 1px solid var(--border);
+  font-size: .92rem; font-weight: 700;
+  background: var(--area-bg); border-left: 4px solid var(--area-border);
+  color: var(--area-text); min-height: 0; line-height: 1.3;
+}
+
+#grid-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+#quarter-header {
+  display: flex; background: #ececec; border-bottom: 2px solid #bbb;
+  flex-shrink: 0; height: var(--quarter-h);
+}
+.quarter-cell {
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 800; color: var(--gray);
+  letter-spacing: .12em; text-transform: uppercase;
+  border-right: 2px solid #bbb; transition: background .2s, color .2s; overflow: hidden;
+}
+.quarter-cell:last-child { border-right: none; }
+.quarter-cell.active { background: var(--yellow); color: var(--black); }
+
+#month-header {
+  display: flex; background: var(--light); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; height: var(--header-h);
+}
+.month-cell {
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; color: var(--gray); text-transform: uppercase;
+  letter-spacing: .06em; font-weight: 700;
+  border-right: 1px solid var(--border); transition: background .2s, color .2s;
+  overflow: hidden; flex-shrink: 0;
+}
+.month-cell:last-child { border-right: none; }
+.month-cell.q-end { border-right: 2px solid #bbb; }
+.month-cell.active { background: var(--yellow); color: var(--black); font-weight: 800; }
+
+#rows-wrap {
+  flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden;
+}
+.grid-row {
+  flex: 1; position: relative; border-bottom: 1px solid var(--border);
+  min-height: 0; overflow: hidden; background: var(--white);
+}
+.grid-row:nth-child(even) { background: #fafafa; }
+.grid-row::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.grid-row::after  { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+
+#col-highlight {
+  position: absolute; top: 0; bottom: 0;
+  background: rgba(255,210,0,.14);
+  border-left: 2.5px solid rgba(210,160,0,.65);
+  border-right: 2.5px solid rgba(210,160,0,.65);
+  pointer-events: none; z-index: 10;
+}
+
+.activity {
+  position: absolute; border-radius: var(--radius);
+  background: var(--area-bg); border: 1.5px solid var(--area-border); color: var(--area-text);
+  display: flex; align-items: center; padding: 0 6px; gap: 4px;
+  font-size: .72rem; font-weight: 600; cursor: pointer;
+  overflow: hidden; white-space: nowrap;
+  transition: filter .15s, box-shadow .15s; min-width: 20px; z-index: 2;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.activity:hover { filter: brightness(.94); box-shadow: 0 2px 7px rgba(0,0,0,.18); z-index: 3; }
+.activity:focus { outline: 2px solid var(--black); z-index: 4; }
+.activity-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.info-btn {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--area-border); color: var(--white);
+  font-size: .6rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer; border: none; z-index: 3; line-height: 1;
+}
+.info-btn:focus { outline: 2px solid var(--black); }
+
+.tooltip {
+  position: fixed; background: var(--black); border: 1.5px solid var(--yellow);
+  color: var(--white); border-radius: var(--radius); padding: 10px 14px;
+  font-size: .8rem; line-height: 1.55; z-index: 9999; max-width: 280px;
+  box-shadow: var(--shadow); pointer-events: none;
+}
+.tooltip strong   { color: var(--yellow); display: block; margin-bottom: 4px; }
+.tooltip .t-desc  { color: #ddd; }
+.tooltip .t-dates { color: #bbb; font-size: .74rem; }
+.tooltip .t-area  { color: #888; font-size: .7rem; margin-top: 4px; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.40); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-overlay[hidden] { display: none; }
+.modal-box {
+  background: var(--white); border: 2px solid var(--yellow); border-radius: 10px;
+  padding: 28px 32px; width: 480px; max-width: 96vw;
+  box-shadow: 0 10px 40px rgba(0,0,0,.18);
+}
+.modal-box h2 {
+  font-size: 1.08rem; color: var(--black); margin-bottom: 20px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--yellow);
+  display: flex; align-items: center; gap: 8px;
+}
+.modal-box h2::before { content: '▲'; font-size: .9rem; opacity: .6; }
+.form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+.form-group label { font-size: .77rem; color: var(--gray); font-weight: 700; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: var(--white); color: var(--black); border: 1.5px solid #ccc;
+  border-radius: var(--radius); padding: 8px 10px;
+  font-family: var(--font); font-size: .88rem; width: 100%;
+}
+.form-group select { padding-right: 28px; }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none; border-color: var(--yellow);
+  box-shadow: 0 0 0 2px rgba(255,212,0,.25);
+}
+.form-group textarea { resize: vertical; min-height: 68px; }
+.date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-error-msg { color: #c62828; font-size: .78rem; margin-bottom: 10px; min-height: 18px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header id="page-banner" role="banner">
+  <span id="banner-title">ROADMAPA - Raiffeisen banka</span>
+  <div id="banner-filter">
+    <label for="banner-month">Aktuálny mesiac:</label>
+    <select id="banner-month" aria-label="Zvýrazniť mesiac">
+      <option value="">– vyber –</option>
+    </select>
+  </div>
+</header>
+
+<div id="topbar" role="toolbar" aria-label="Filtre a pridanie aktivity">
+  <button class="btn-primary" id="btn-open-add" aria-label="Pridať novú aktivitu">
+    <span class="plus">+</span> Pridať aktivitu
+  </button>
+  <div class="sep" aria-hidden="true"></div>
+  <span class="filter-label">Oblasť:</span>
+  <select id="filter-area" aria-label="Filtrovať podľa oblasti">
+    <option value="">Všetky oblasti</option>
+  </select>
+  <span class="filter-label">Mesiace (Ctrl+klik = viac):</span>
+  <select id="filter-months" multiple aria-label="Filtrovať podľa mesiacov"></select>
+  <button id="btn-reset-filter" type="button" aria-label="Zrušiť filtre">✕ Zrušiť filter</button>
+</div>
+
+<div id="main">
+  <div id="sidebar" role="complementary" aria-label="Oblasti">
+    <div class="sidebar-header">Oblasť</div>
+  </div>
+  <div id="grid-wrap">
+    <div id="quarter-header" role="row" aria-label="Kvartály"></div>
+    <div id="month-header"   role="row" aria-label="Mesiace"></div>
+    <div id="rows-wrap" aria-label="Roadmapa"></div>
+  </div>
+</div>
+
+<div id="add-overlay" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
+  <div class="modal-box">
+    <h2 id="add-modal-title">Pridať aktivitu</h2>
+    <div class="form-group">
+      <label for="a-title">Názov *</label>
+      <input id="a-title" type="text" placeholder="Zadaj názov aktivity" autocomplete="off"/>
+    </div>
+    <div class="form-group">
+      <label for="a-desc">Popis</label>
+      <textarea id="a-desc" placeholder="Krátky popis (voliteľné)"></textarea>
+    </div>
+    <div class="date-row">
+      <div class="form-group">
+        <label for="a-start">Dátum od *</label>
+        <input id="a-start" type="date"/>
+      </div>
+      <div class="form-group">
+        <label for="a-end">Dátum do *</label>
+        <input id="a-end" type="date"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="a-area">Oblasť *</label>
+      <select id="a-area"></select>
+    </div>
+    <div class="form-error-msg" id="add-error" role="alert" aria-live="polite"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btn-add-cancel">Zrušiť</button>
+      <button class="btn-primary"   id="btn-add-save">Pridať</button>
+    </div>
+  </div>
+</div>
+
+<div id="edit-overlay" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+  <div class="modal-box">
+    <h2 id="edit-modal-title">Upraviť aktivitu</h2>
+    <div class="form-group">
+      <label for="m-title">Názov *</label>
+      <input id="m-title" type="text" autocomplete="off"/>
+    </div>
+    <div class="form-group">
+      <label for="m-desc">Popis</label>
+      <textarea id="m-desc"></textarea>
+    </div>
+    <div class="date-row">
+      <div class="form-group">
+        <label for="m-start">Dátum od *</label>
+        <input id="m-start" type="date"/>
+      </div>
+      <div class="form-group">
+        <label for="m-end">Dátum do *</label>
+        <input id="m-end" type="date"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="m-area">Oblasť</label>
+      <select id="m-area"></select>
+    </div>
+    <div class="form-error-msg" id="edit-error" role="alert" aria-live="polite"></div>
+    <div class="modal-actions">
+      <button class="btn-danger"    id="btn-delete">Vymazať</button>
+      <button class="btn-secondary" id="btn-edit-cancel">Zrušiť</button>
+      <button class="btn-primary"   id="btn-save">Uložiť</button>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip" hidden role="tooltip"></div>
+
+<script>
+const STORAGE_KEY = 'roadmap_v_final';
+const MONTHS_SK   = ['Jan','Feb','Mar','Apr','Máj','Jún','Júl','Aug','Sep','Okt','Nov','Dec'];
+const QUARTERS    = ['Q1','Q2','Q3','Q4'];
+const AREAS = [
+  'Motivácia distribučnej siete',
+  'Podpora benefitová',
+  'ATL a iné média',
+  'Eventy a kontakty',
+  'Produktové zmeny',
+  'Distribučná sieť',
+];
+
+function loadItems() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+function saveItems(items) { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function parseDate(iso) { if (!iso) return null; const d = new Date(iso + 'T00:00:00'); return isNaN(d.getTime()) ? null : d; }
+function monthOf(iso) { const d = parseDate(iso); return d ? d.getMonth() : -1; }
+function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+function dateToFraction(iso) { const d = parseDate(iso); if (!d) return 0; const m = d.getMonth(), day = d.getDate(); return (m + (day-1)/daysInMonth(d.getFullYear(),m))/12; }
+function endDateToFraction(iso) { const d = parseDate(iso); if (!d) return 0; const m = d.getMonth(), day = d.getDate(); return (m + day/daysInMonth(d.getFullYear(),m))/12; }
+function isoToDisplay(iso) { if (!iso) return ''; const p = iso.split('-'); return p.length===3 ? `${p[2]}-${p[1]}-${p[0]}` : iso; }
+function clamp(v,lo,hi) { return Math.min(Math.max(v,lo),hi); }
+
+function assignLanes(items) {
+  if (!items.length) return { assignments:[], totalLanes:0 };
+  const fracs = items.map(it => ({ s:dateToFraction(it.start), e:endDateToFraction(it.end) }));
+  const sorted = fracs.map((f,i) => ({i,s:f.s,e:f.e})).sort((a,b) => a.s-b.s);
+  const laneEnd=[], assignments=new Array(items.length);
+  for (const {i,s,e} of sorted) {
+    let lane=laneEnd.findIndex(x => x<=s);
+    if (lane===-1) { lane=laneEnd.length; laneEnd.push(e); } else { laneEnd[lane]=Math.max(laneEnd[lane],e); }
+    assignments[i]=lane;
+  }
+  return { assignments, totalLanes:laneEnd.length };
+}
+
+function laneGeometry(lane,total) {
+  if (total<=1) return {top:15,height:70};
+  const PAD=4,GAP=3,avail=100-2*PAD-(total-1)*GAP,height=Math.max(avail/total,8);
+  return {top:PAD+lane*(height+GAP),height};
+}
+
+function getActiveMonths() {
+  const sel=document.getElementById('filter-months');
+  const selected=Array.from(sel.selectedOptions).map(o=>parseInt(o.value,10));
+  if (!selected.length) return null;
+  return new Set(selected);
+}
+
+function buildLayout() {
+  const sidebar=document.getElementById('sidebar');
+  AREAS.forEach((name,i) => { const div=document.createElement('div'); div.className=`sidebar-row area-${i}`; div.dataset.area=i; div.textContent=name; sidebar.appendChild(div); });
+  const rowsWrap=document.getElementById('rows-wrap');
+  AREAS.forEach((name,i) => { const row=document.createElement('div'); row.className=`grid-row area-${i}`; row.dataset.areaIndex=i; row.setAttribute('aria-label',name); rowsWrap.appendChild(row); });
+  const colHL=document.createElement('div'); colHL.id='col-highlight'; colHL.hidden=true; colHL.setAttribute('aria-hidden','true'); rowsWrap.appendChild(colHL);
+  [document.getElementById('a-area'),document.getElementById('m-area')].forEach(sel => {
+    AREAS.forEach((name,i) => { const opt=document.createElement('option'); opt.value=String(i); opt.textContent=name; sel.appendChild(opt); });
+  });
+  const fa=document.getElementById('filter-area');
+  AREAS.forEach((name,i) => { const opt=document.createElement('option'); opt.value=String(i); opt.textContent=name; fa.appendChild(opt); });
+  const fm=document.getElementById('filter-months');
+  MONTHS_SK.forEach((m,i) => { const opt=document.createElement('option'); opt.value=String(i); opt.textContent=m; fm.appendChild(opt); });
+  const bm=document.getElementById('banner-month');
+  MONTHS_SK.forEach((m,i) => { const opt=document.createElement('option'); opt.value=String(i); opt.textContent=m; bm.appendChild(opt); });
+}
+
+function rebuildHeaders(activeMonths) {
+  const visibleMonths = activeMonths ? MONTHS_SK.map((_,i)=>i).filter(i=>activeMonths.has(i)) : MONTHS_SK.map((_,i)=>i);
+  const total=visibleMonths.length;
+  const qHeader=document.getElementById('quarter-header'); qHeader.innerHTML='';
+  const qGroups={0:[],1:[],2:[],3:[]};
+  visibleMonths.forEach(m=>qGroups[Math.floor(m/3)].push(m));
+  Object.entries(qGroups).forEach(([qIdx,months]) => {
+    if (!months.length) return;
+    const cell=document.createElement('div'); cell.className='quarter-cell'; cell.dataset.q=qIdx;
+    cell.textContent=QUARTERS[qIdx]; cell.style.flex=months.length+' 0 0'; qHeader.appendChild(cell);
+  });
+  const mHeader=document.getElementById('month-header'); mHeader.innerHTML='';
+  visibleMonths.forEach((mIdx,pos) => {
+    const cell=document.createElement('div'); cell.className='month-cell'; cell.dataset.m=mIdx;
+    cell.textContent=MONTHS_SK[mIdx]; cell.style.flex='1 0 0';
+    const next=visibleMonths[pos+1];
+    if (next!==undefined && Math.floor(mIdx/3)!==Math.floor(next/3)) cell.classList.add('q-end');
+    mHeader.appendChild(cell);
+  });
+  const thinLines=visibleMonths.slice(0,-1).map((_,pos) => { const pct=((pos+1)/total*100).toFixed(3); return `transparent calc(${pct}% - 1px),#e8e8e8 calc(${pct}% - 1px),#e8e8e8 calc(${pct}%),transparent calc(${pct}%)`; });
+  const thickLines=[];
+  visibleMonths.forEach((mIdx,pos) => {
+    if (pos===visibleMonths.length-1) return;
+    if (Math.floor(mIdx/3)!==Math.floor(visibleMonths[pos+1]/3)) {
+      const pct=((pos+1)/total*100).toFixed(3);
+      thickLines.push(`transparent calc(${pct}% - 1px),#bbb calc(${pct}% - 1px),#bbb calc(${pct}% + 1px),transparent calc(${pct}% + 1px)`);
+    }
+  });
+  const thinBg  = thinLines.length  ? thinLines.map(l  =>`linear-gradient(to right,${l})`).join(',') : 'none';
+  const thickBg = thickLines.length ? thickLines.map(l =>`linear-gradient(to right,${l})`).join(',') : 'none';
+  let sheet=document.getElementById('dynamic-grid-style');
+  if (!sheet) { sheet=document.createElement('style'); sheet.id='dynamic-grid-style'; document.head.appendChild(sheet); }
+  sheet.textContent=`.grid-row::before{background:${thinBg}}.grid-row::after{background:${thickBg}}`;
+  return {visibleMonths,total};
+}
+
+function renderAll() {
+  const items=loadItems(), filterArea=document.getElementById('filter-area').value, activeMonths=getActiveMonths();
+  const {visibleMonths,total}=rebuildHeaders(activeMonths);
+  document.querySelectorAll('.grid-row').forEach(r=>r.querySelectorAll('.activity').forEach(a=>a.remove()));
+  AREAS.forEach((_,areaIdx) => {
+    const areaStr=String(areaIdx);
+    const areaItems=items.filter(item => {
+      if (item.area!==areaStr) return false;
+      if (filterArea!==''&&item.area!==filterArea) return false;
+      if (activeMonths) { const s=monthOf(item.start),e=monthOf(item.end); let ok=false; for (let m=s;m<=e;m++) { if (activeMonths.has(m)){ok=true;break;} } if (!ok) return false; }
+      return true;
+    });
+    const {assignments,totalLanes}=assignLanes(areaItems);
+    areaItems.forEach((item,idx)=>renderBlock(item,assignments[idx],totalLanes,visibleMonths,total));
+  });
+  updateRowVisibility(items,filterArea,activeMonths);
+}
+
+function updateRowVisibility(items,filterArea,activeMonths) {
+  AREAS.forEach((_,areaIdx) => {
+    const areaStr=String(areaIdx);
+    const gridRow=document.querySelector(`.grid-row[data-area-index="${areaIdx}"]`);
+    const sidebarRow=document.querySelector(`.sidebar-row[data-area="${areaIdx}"]`);
+    if (!gridRow||!sidebarRow) return;
+    let visible=true;
+    if (filterArea!==''&&filterArea!==areaStr) visible=false;
+    if (visible&&activeMonths) {
+      const hasMatch=items.some(it => { if (it.area!==areaStr) return false; const s=monthOf(it.start),e=monthOf(it.end); for (let m=s;m<=e;m++){if(activeMonths.has(m))return true;} return false; });
+      if (!hasMatch) visible=false;
+    }
+    const d=visible?'':'none'; gridRow.style.display=d; sidebarRow.style.display=d;
+  });
+}
+
+function renderBlock(item,lane,totalLanes,visibleMonths,totalVisible) {
+  const row=document.querySelector(`.grid-row[data-area-index="${item.area}"]`); if (!row) return;
+  const startFrac=dateToFraction(item.start), endFrac=endDateToFraction(item.end);
+  let left,width;
+  if (!visibleMonths||visibleMonths.length===12) {
+    left=(Math.max(0,Math.min(1,startFrac))*100).toFixed(3);
+    width=(Math.max(endFrac-startFrac,1/365)*100).toFixed(3);
+  } else {
+    const firstM=visibleMonths[0],lastM=visibleMonths[visibleMonths.length-1];
+    const viewStartFrac=firstM/12,viewEndFrac=(lastM+1)/12,viewSpan=viewEndFrac-viewStartFrac,cellFrac=1/totalVisible;
+    const relStart=(startFrac-viewStartFrac)/viewSpan, relEnd=(endFrac-viewStartFrac)/viewSpan;
+    left=(Math.max(0,Math.min(1,relStart))*100).toFixed(3);
+    const w=Math.max(relEnd-Math.max(0,relStart),cellFrac*0.1);
+    width=(Math.min(w,1-Math.max(0,relStart))*100).toFixed(3);
+  }
+  const {top,height}=laneGeometry(lane,totalLanes);
+  const block=document.createElement('div');
+  block.className=`activity area-${item.area}`; block.dataset.id=item.id;
+  block.style.left=left+'%'; block.style.width=width+'%';
+  block.style.top=top.toFixed(1)+'%'; block.style.height=height.toFixed(1)+'%';
+  block.setAttribute('tabindex','0'); block.setAttribute('role','button');
+  block.setAttribute('aria-label',item.title+', '+isoToDisplay(item.start)+' – '+isoToDisplay(item.end));
+  const titleSpan=document.createElement('span'); titleSpan.className='activity-title'; titleSpan.textContent=item.title;
+  const infoBtn=document.createElement('button'); infoBtn.className='info-btn'; infoBtn.textContent='i';
+  infoBtn.setAttribute('aria-label','Detail: '+item.title);
+  block.appendChild(titleSpan); block.appendChild(infoBtn); row.appendChild(block);
+  infoBtn.addEventListener('mouseenter',ev=>showTooltip(ev,item));
+  infoBtn.addEventListener('mouseleave',hideTooltip);
+  infoBtn.addEventListener('focus',ev=>showTooltip(ev,item));
+  infoBtn.addEventListener('blur',hideTooltip);
+  block.addEventListener('dblclick',()=>openEditModal(item.id));
+  block.addEventListener('keydown',ev=>{if(ev.key==='Enter')openEditModal(item.id);});
+}
+
+function highlightMonth(monthIdx) {
+  document.querySelectorAll('.month-cell').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.m,10)===monthIdx));
+  const qIdx=monthIdx!==null?Math.floor(monthIdx/3):null;
+  document.querySelectorAll('.quarter-cell').forEach(c=>c.classList.toggle('active',parseInt(c.dataset.q,10)===qIdx));
+  const colHL=document.getElementById('col-highlight');
+  if (monthIdx===null){colHL.hidden=true;return;}
+  const activeMonths=getActiveMonths();
+  const visibleMonths=activeMonths?MONTHS_SK.map((_,i)=>i).filter(i=>activeMonths.has(i)):MONTHS_SK.map((_,i)=>i);
+  const pos=visibleMonths.indexOf(monthIdx); if (pos===-1){colHL.hidden=true;return;}
+  const total=visibleMonths.length;
+  colHL.style.left=(pos/total*100).toFixed(3)+'%'; colHL.style.width=(1/total*100).toFixed(3)+'%'; colHL.hidden=false;
+}
+
+document.getElementById('banner-month').addEventListener('change',function(){highlightMonth(this.value===''?null:parseInt(this.value,10));});
+
+const tooltipEl=document.getElementById('tooltip');
+function showTooltip(ev,item) {
+  tooltipEl.innerHTML=`<strong>${item.title}</strong><div class="t-desc">${item.desc||'Žiadny popis'}</div><div class="t-dates">${isoToDisplay(item.start)} – ${isoToDisplay(item.end)}</div><div class="t-area">${AREAS[parseInt(item.area,10)]}</div>`;
+  tooltipEl.hidden=false; positionTooltip(ev);
+}
+function positionTooltip(ev) {
+  if (tooltipEl.hidden) return;
+  const TW=tooltipEl.offsetWidth,TH=tooltipEl.offsetHeight,VW=window.innerWidth,VH=window.innerHeight,G=12;
+  let x=ev.clientX+G,y=ev.clientY+G;
+  if (x+TW>VW-G) x=ev.clientX-TW-G; if (y+TH>VH-G) y=ev.clientY-TH-G;
+  tooltipEl.style.left=clamp(x,G,VW-TW-G)+'px'; tooltipEl.style.top=clamp(y,G,VH-TH-G)+'px';
+}
+function hideTooltip(){tooltipEl.hidden=true;}
+document.addEventListener('mousemove',ev=>{if(!tooltipEl.hidden)positionTooltip(ev);});
+
+const addOverlay=document.getElementById('add-overlay');
+function openAddModal(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('a-title').value=''; document.getElementById('a-desc').value='';
+  document.getElementById('a-start').value=today; document.getElementById('a-end').value=today;
+  document.getElementById('a-area').selectedIndex=0; document.getElementById('add-error').textContent='';
+  addOverlay.hidden=false; document.getElementById('a-title').focus();
+}
+function closeAddModal(){addOverlay.hidden=true;}
+document.getElementById('btn-open-add').addEventListener('click',openAddModal);
+document.getElementById('btn-add-cancel').addEventListener('click',closeAddModal);
+addOverlay.addEventListener('click',ev=>{if(ev.target===addOverlay)closeAddModal();});
+document.getElementById('btn-add-save').addEventListener('click',()=>{
+  const title=document.getElementById('a-title').value.trim();
+  const desc=document.getElementById('a-desc').value.trim();
+  const start=document.getElementById('a-start').value;
+  const end=document.getElementById('a-end').value;
+  const area=document.getElementById('a-area').value;
+  const errEl=document.getElementById('add-error');
+  if (!title){errEl.textContent='Názov je povinný.';return;}
+  if (!start){errEl.textContent='Dátum od je povinný.';return;}
+  if (!end){errEl.textContent='Dátum do je povinný.';return;}
+  const ds=parseDate(start),de=parseDate(end);
+  if (!ds||!de){errEl.textContent='Neplatný dátum.';return;}
+  if (ds>de){errEl.textContent='Dátum od musí byť ≤ dátum do.';return;}
+  errEl.textContent='';
+  const items=loadItems(); items.push({id:genId(),title,desc,start,end,area}); saveItems(items); renderAll(); closeAddModal();
+});
+
+const editOverlay=document.getElementById('edit-overlay');
+let editingId=null;
+function openEditModal(id){
+  const item=loadItems().find(i=>i.id===id); if (!item) return;
+  editingId=id;
+  document.getElementById('m-title').value=item.title; document.getElementById('m-desc').value=item.desc||'';
+  document.getElementById('m-start').value=item.start; document.getElementById('m-end').value=item.end;
+  document.getElementById('m-area').value=item.area; document.getElementById('edit-error').textContent='';
+  editOverlay.hidden=false; hideTooltip(); document.getElementById('m-title').focus();
+}
+function closeEditModal(){editOverlay.hidden=true;editingId=null;}
+document.getElementById('btn-edit-cancel').addEventListener('click',closeEditModal);
+editOverlay.addEventListener('click',ev=>{if(ev.target===editOverlay)closeEditModal();});
+document.getElementById('btn-save').addEventListener('click',()=>{
+  const title=document.getElementById('m-title').value.trim();
+  const desc=document.getElementById('m-desc').value.trim();
+  const start=document.getElementById('m-start').value;
+  const end=document.getElementById('m-end').value;
+  const area=document.getElementById('m-area').value;
+  const errEl=document.getElementById('edit-error');
+  if (!title){errEl.textContent='Názov je povinný.';return;}
+  if (!start){errEl.textContent='Dátum od je povinný.';return;}
+  if (!end){errEl.textContent='Dátum do je povinný.';return;}
+  const ds=parseDate(start),de=parseDate(end);
+  if (!ds||!de){errEl.textContent='Neplatný dátum.';return;}
+  if (ds>de){errEl.textContent='Dátum od musí byť ≤ dátum do.';return;}
+  errEl.textContent='';
+  const items=loadItems(); const idx=items.findIndex(i=>i.id===editingId);
+  if (idx!==-1){items[idx]={id:editingId,title,desc,start,end,area};saveItems(items);renderAll();}
+  closeEditModal();
+});
+document.getElementById('btn-delete').addEventListener('click',()=>{
+  if (!editingId) return;
+  saveItems(loadItems().filter(i=>i.id!==editingId)); renderAll(); closeEditModal();
+});
+
+document.addEventListener('keydown',ev=>{
+  if (ev.key==='Escape'){if(!addOverlay.hidden)closeAddModal();if(!editOverlay.hidden)closeEditModal();}
+});
+
+document.getElementById('filter-area').addEventListener('change',renderAll);
+document.getElementById('filter-months').addEventListener('change',()=>{
+  renderAll(); const bm=document.getElementById('banner-month'); if(bm.value!=='')highlightMonth(parseInt(bm.value,10));
+});
+document.getElementById('btn-reset-filter').addEventListener('click',()=>{
+  document.getElementById('filter-area').value='';
+  Array.from(document.getElementById('filter-months').options).forEach(o=>o.selected=false);
+  renderAll(); highlightMonth(null); document.getElementById('banner-month').value='';
+});
+
+(function init(){buildLayout();renderAll();})();
+</script>
+</body>
+</html>
